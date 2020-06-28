@@ -1,0 +1,15 @@
+[package]
+name = "bankroll"
+version = "0.0.0"
+authors = ["Daniel Tucker <daniel@dantuck.com>"]
+edition = "2018"
+license = "GPL-3.0"
+description = "[WIP] Financial Ledger"
+keywords = ["accounting", "finance", "ledger"]
+repository = "https://gitlab.com/dantuck/bankroll"
+documentation = "https://docs.rs/bankroll"
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
