@@ -1,3 +1,5 @@
-fn main() {
-    println!("Welcome to bankroll");
+mod cli;
+
+fn main() -> Result<(), std::io::Error> {
+    cli::run()
 }
