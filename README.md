@@ -9,3 +9,11 @@
 [Code of Conduct]: CODE_OF_CONDUCT.md
 
 Ledger implementation in rust
+
+## Local testing run
+
+For balance:
+
+```
+LEDGER_FILE=ledger.tpl.toml cargo run balance
+```

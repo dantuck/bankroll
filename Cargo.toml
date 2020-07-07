@@ -1,7 +1,7 @@
 [package]
 name = "bankroll"
 version = "0.0.0"
-authors = ["Daniel Tucker <daniel@dantuck.com>"]
+authors = ["Daniel Tucker <gitlab@dantuck.com>"]
 edition = "2018"
 license = "GPL-3.0"
 description = "[WIP] Financial Ledger"
@@ -14,3 +14,6 @@ readme = "README.md"
 
 [dependencies]
 structopt = "0.3"
+toml = "0.5.6"
+serde = { version = "1.0.114", features = ["derive"] }
+monee = "0.0.5"
