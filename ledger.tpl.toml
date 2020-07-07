@@ -1,0 +1,47 @@
+[[transaction]]
+description = "income"
+account = "opening balance"
+[[transaction.entry]]
+amount = 3000
+account = "checking"
+[[transaction.entry]]
+amount = 10000
+account = "savings"
+
+[[transaction]]
+description = "Sample transaction"
+account = "checking"
+# amount and account_offset are optional
+    [[transaction.entry]]
+    amount = 10.00
+    account = "general"
+    [[transaction.entry]]
+    amount = 10.00
+    account = "general"
+    [[transaction.entry]]
+    amount = -10.00
+    account = "savings"
+
+# demonstrates that transaction entries can be split up in a file
+[default]
+account = "checking"
+account_offset = "general"
+
+[[transaction]]
+description = "Sample transaction"
+account = "checking"
+amount = 20.00
+account_offset = "general"
+# if entries are supplied amount and account_offset above are ignored
+[[transaction.entry]]
+amount = 10.00
+account = "general"
+[[transaction.entry]]
+amount = 10.00
+account = "general"
+
+[[transaction]]
+description = "Movie night"
+account = "credit"
+amount = 15.00
+account_offset = "entertainment"

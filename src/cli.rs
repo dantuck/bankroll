@@ -23,7 +23,7 @@ pub enum Opt {
 
 pub fn run() -> Result<(), std::io::Error> {
     let cli = Cli::from_args();
-
+    
     match &cli.cmd {
         Opt::Balance(opt) => balance::eval(&cli, &opt)?,
         Opt::Register(opt) => register::eval(&cli, &opt)?,
