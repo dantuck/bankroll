@@ -1,17 +1,17 @@
 use serde::Deserialize;
-// use std::hash::{Hash, Hasher};
 use std::collections::HashMap;
 
 use crate::model::{account};
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Entry {
     pub amount: f64,
     pub account: String,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Transaction {
+    pub date: String,
     pub description: String,
     pub account: Option<String>,
     pub account_offset: Option<String>,
@@ -19,18 +19,24 @@ pub struct Transaction {
     pub entry: Option<Vec<Entry>>,
 }
 
+#[derive(Clone, Debug)]
 pub struct TransactionMeta {
-    pub accounts: HashMap<String, account::Account>
+    pub date: String,
+    pub description: String,
+    pub entries: Vec<Entry>,
+    pub accounts: HashMap<String, account::Account>,
 }
 
 impl Transaction {
-    pub fn parse(mut self) -> TransactionMeta {
+    pub fn parse(self) -> TransactionMeta {
         let mut check: f64 = 0.0;
         let mut accounts: HashMap<String, account::Account> = HashMap::new();
+        let mut entries_parsed: Vec<Entry> = Vec::new();
 
-        if let Some(entries) = &self.entry {
+        if let Some(entries) = self.entry {
             for entry in entries {
                 check += entry.amount;
+                entries_parsed.push(entry);
             }
         }
         else if let Some(_t) = self.amount {
@@ -41,27 +47,21 @@ impl Transaction {
             };
 
             check += entry.amount;
-            self.entry = Some(
-                vec![
-                    entry
-                ]
-            ); 
+            entries_parsed.push(entry);
         }
 
         if check != 0.0 {
             if let Some(account) = self.account {
                 let check_inverse = if check > 0.0 { -check } else { check.abs() };
-                let mut entries = self.entry.unwrap();
-                entries.push(Entry {
+                
+                entries_parsed.push(Entry {
                     amount: check_inverse,
                     account: account,
                 });
-
-                self.entry = Some(entries);
             }
         }
 
-        for entry in self.entry.unwrap().iter() {
+        for entry in &entries_parsed {
             match accounts.get_mut(&entry.account) {
                 Some(account) => {
                     account.balance += &entry.amount;
@@ -79,6 +79,9 @@ impl Transaction {
         }
 
         TransactionMeta {
+            date: self.date,
+            description: self.description,
+            entries: entries_parsed,
             accounts: accounts,
         }
     }

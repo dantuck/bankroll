@@ -1,17 +1,23 @@
 use std::collections::HashMap;
-
-use crate::cli::*;
 use crate::util::*;
-use crate::model::{ledger, transaction, account};
+use crate::cli::*;
+use crate::model::{transaction, account};
 use monee::*;
 
 #[derive(Debug, StructOpt)]
 pub struct BalanceOpt { }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 struct Balance {
     accounts: HashMap<String, account::Account>,
     check: f64
+}
+
+#[macro_export]
+macro_rules! balance {
+    ($x:expr) => {
+        Balance::new($x)
+    };
 }
 
 impl Balance {
@@ -81,22 +87,29 @@ pub fn process_transactions(transactions: Vec<transaction::Transaction>) -> (Has
     (accounts, check)
 }
 
-fn get_file() -> ledger::Ledger {
-    let ledger_file_env = match std::env::var("LEDGER_FILE") {
-        Ok(p) => format!("{}", p),
-        Err(_) => format!("{}", ""),
-    };
-
-    // println!("ledger_file: {}", ledger_file_env);
-
-    parser::parse_ledger(&ledger_file_env.to_string())
-}
-
 pub fn eval(_cli: &Cli, _cmd: &BalanceOpt) -> Result<(), std::io::Error> {
-    let ledger = get_file();
+    let ledger = file::load();
 
     let balances = Balance::new(ledger.transaction);
     balances.print();
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_balance_empty_transactions() {
+        let balance = Balance {
+            accounts: HashMap::new(),
+            check: 0.0
+        };
+        let test_account = balance!(None);
+        assert_eq!(
+            test_account.accounts.is_empty(),
+            balance.accounts.is_empty()
+        );
+    }
 }
