@@ -1,23 +1,32 @@
-// use std::ops::{AddAssign};
-
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Account {
     pub name: String,
     pub balance: f64,
 }
 
-// pub struct Accounts {
+#[macro_export]
+macro_rules! account {
+    ($x:expr, $y:expr) => {
+        Account {
+            name: $x.to_string(),
+            balance: $y,
+        }
+    };
+}
 
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-// pub struct AccountBalance {
-//     pub amount: f64
-// }
+    #[test]
+    fn test_account() {
+        let account = Account {
+            name: "test account".to_string(),
+            balance: 20.00,
+        };
 
-// impl AddAssign for AccountBalance {
-//     fn add_assign(&mut self, other: Self) {
-//         *self = Self {
-//             amount: self.amount + other.amount,
-//         };
-//     }
-// }
+        let test_account = account!("test account", 20.00);
+        assert_eq!(test_account.name, account.name);
+        assert_eq!(test_account.balance, account.balance);
+    }
+}
