@@ -40,7 +40,7 @@ impl Register {
                 println!("{0: <10} {1: <30} {2: <20} {3: >15} {4: >15}", 
                     transaction_meta.date,
                     transaction_meta.description.fit_to(30),
-                    first.account.fit_accountname_to(20),
+                    fitaccount(&first.account, 20),
                     format!("{: >1}", money!(first.amount, "USD")),
                     format!("{: >1}", money!(balance, "USD"))
                 );
@@ -50,7 +50,7 @@ impl Register {
 
                     println!("{0: <41} {1: <20} {2: >15} {3: >15}",
                         "",
-                        entry.account.fit_accountname_to(20),
+                        fitaccount(&entry.account, 20),
                         format!("{: >1}", money!(entry.amount, "USD")),
                         format!("{: >1}", money!(balance, "USD"))
                     );
