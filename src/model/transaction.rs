@@ -3,6 +3,51 @@ use std::collections::HashMap;
 
 use crate::model::{account};
 
+pub trait Truncate {
+    fn fit_to(&self, chars: usize) -> String;
+    fn truncate_to_offset(&self, boundary: usize) -> String;
+}
+
+impl Truncate for str {
+    fn fit_to(&self, chars: usize) -> String {
+        if chars == 0 {
+            return self[..0].to_string();
+        }
+
+        match self.char_indices().nth(chars) {
+            None => return self.to_string(),
+            Some((boundary, _)) => {
+                return self.truncate_to_offset(boundary);
+            }
+        };
+    }
+
+    fn truncate_to_offset(&self, boundary: usize) -> String {
+        if boundary > self.len() {
+            return self.to_string()
+        }
+
+        let mut char_iter = self
+            .char_indices()
+            .rev()
+            .skip_while(move |(n, char)| {
+                *n > boundary - 2 || !char.is_ascii_whitespace()
+            });
+
+        let mut charcount = boundary;
+
+        if let Some((bound, _)) = char_iter.next() {
+            charcount = bound;
+        };
+
+        let mut truncated: String = self[..charcount].trim_end().to_string();
+
+        truncated.push_str("…");
+
+        truncated
+    }
+}
+
 #[derive(Deserialize, Clone, Debug)]
 pub struct Entry {
     pub amount: f64,
@@ -52,7 +97,11 @@ impl Transaction {
 
         if check != 0.0 {
             if let Some(account) = self.account {
-                let check_inverse = if check > 0.0 { -check } else { check.abs() };
+                let check_inverse = if check > 0.0 {
+                    -check 
+                } else { 
+                    check.abs() 
+                };
                 
                 entries_parsed.push(Entry {
                     amount: check_inverse,
