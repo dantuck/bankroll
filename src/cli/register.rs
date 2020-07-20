@@ -1,7 +1,9 @@
 use crate::cli::*;
 use crate::util::*;
-use crate::model::{ledger, transaction};
+use crate::model::{ledger, transaction, account};
 use monee::*;
+use transaction::*;
+use account::*;
 
 #[derive(Debug, StructOpt)]
 pub struct RegisterOpt { }
@@ -35,10 +37,10 @@ impl Register {
             if let Some((first, entries)) = transaction_meta.entries.split_first() {
                 balance += first.amount;
 
-                println!("{0: <10} {1: <30} {2: <30} {3: >15} {4: >15}", 
+                println!("{0: <10} {1: <30} {2: <20} {3: >15} {4: >15}", 
                     transaction_meta.date,
-                    transaction_meta.description,
-                    first.account,
+                    transaction_meta.description.fit_to(30),
+                    fitaccount(&first.account, 20),
                     format!("{: >1}", money!(first.amount, "USD")),
                     format!("{: >1}", money!(balance, "USD"))
                 );
@@ -46,9 +48,9 @@ impl Register {
                 for entry in entries {
                     balance += entry.amount;
 
-                    println!("{0: <41} {1: <30} {2: >15} {3: >15}",
+                    println!("{0: <41} {1: <20} {2: >15} {3: >15}",
                         "",
-                        entry.account,
+                        fitaccount(&entry.account, 20),
                         format!("{: >1}", money!(entry.amount, "USD")),
                         format!("{: >1}", money!(balance, "USD"))
                     );
