@@ -11,7 +11,7 @@ account = "Assets:savings"
 
 [[transaction]]
 date = "2020-01-01"
-description = "Sample transaction"
+description = "Sample really long that would cause wrap"
 account = "Assets:checking"
 # amount and account_offset are optional
     [[transaction.entry]]

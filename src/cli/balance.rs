@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use ansi_term::Colour::{RGB, Green, White};
+use ansi_term::{ANSIString, ANSIStrings};
+
 use crate::util::*;
 use crate::cli::*;
 use crate::model::{transaction, account};
@@ -18,6 +21,38 @@ macro_rules! balance {
     ($x:expr) => {
         Balance::new($x)
     };
+}
+
+fn print_horizontal_line(width: usize) {
+    let orange = RGB(255, 140, 0);
+    let hline = "─".repeat(width);
+    println!("{}", orange.normal().paint(hline));
+}
+
+fn print_account_ln(account: &account::Account) {
+    let mut color: ansi_term::Colour = White;
+
+    if account.balance >= 0.0 {
+        color = Green
+    }
+
+    let money_formatted = ANSIString::from(
+        color.paint(
+            format!("{: >15}",
+                format!("{: >1}", money!(account.balance, "USD"))
+            )
+        )
+    );
+    
+    let strings: &[ANSIString<'static>] = &[
+        money_formatted,
+        ANSIString::from(" "),
+        ANSIString::from(
+            format!("{: <}", account.name)
+        )
+    ];
+
+    println!("{}", ANSIStrings(strings))
 }
 
 impl Balance {
@@ -45,12 +80,9 @@ impl Balance {
         accounts.sort_unstable_by(|a, b| a.0.cmp(&b.0));
 
         for (_, account) in accounts.iter() {
-            println!("{0: >15}  {1: <}",
-                format!("{: >1}", money!(account.balance, "USD")),
-                account.name
-            );
+            print_account_ln(account);
         }
-        println!("{:->15}", "");
+        print_horizontal_line(15);
         println!("{:>15}", self.check);
 
         println!();
