@@ -5,6 +5,8 @@ use monee::*;
 use transaction::*;
 use account::*;
 
+use crate::error::Result;
+
 #[derive(Debug, StructOpt)]
 pub struct RegisterOpt { }
 
@@ -62,9 +64,10 @@ impl Register {
     }
 }
 
-pub fn eval(_cli: &Cli, _cmd: &RegisterOpt) -> Result<(), std::io::Error> {
-    let register = register!(file::load());
-    register.print();
+pub fn eval(_cli: &Cli, _cmd: &RegisterOpt) -> Result<()> {
+    let ledger_file = file::load()?;
+
+    register!(ledger_file).print();
 
     Ok(())
 }

@@ -1,6 +1,6 @@
 [package]
 name = "bankroll"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Daniel Tucker <gitlab@dantuck.com>"]
 edition = "2018"
 license = "GPL-3.0"
@@ -20,3 +20,4 @@ monee = "0.0.5"
 chrono = "0.4.13"
 ansi_term = "0.12.1"
 ansi_colours = "1.0.1"
+csv = "1.1.3"

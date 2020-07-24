@@ -5,7 +5,10 @@ use ansi_term::{ANSIString, ANSIStrings};
 use crate::util::*;
 use crate::cli::*;
 use crate::model::{transaction, account};
-use monee::*;
+
+use monee::{money, Money, self};
+
+use crate::error::Result;
 
 #[derive(Debug, StructOpt)]
 pub struct BalanceOpt { }
@@ -119,11 +122,11 @@ pub fn process_transactions(transactions: Vec<transaction::Transaction>) -> (Has
     (accounts, check)
 }
 
-pub fn eval(_cli: &Cli, _cmd: &BalanceOpt) -> Result<(), std::io::Error> {
-    let ledger = file::load();
+pub fn eval(_cli: &Cli, _cmd: &BalanceOpt) -> Result<()> {
+    let ledger_file = file::load()?;
 
-    let balances = Balance::new(ledger.transaction);
-    balances.print();
+    Balance::new(ledger_file.transaction)
+        .print();
 
     Ok(())
 }
