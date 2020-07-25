@@ -76,7 +76,7 @@ fn parse_import(file: &String, account: &String, account_offset: &String) -> Res
             account: Some(account.to_string()),
             amount: Some(record.amount),
             account_offset: Some(account_offset.to_string()),
-            entry: None
+            post: None
         });
     }
 

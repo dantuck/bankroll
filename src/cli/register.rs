@@ -36,7 +36,7 @@ impl Register {
 
         for transaction_meta in self.transactions {
             let mut balance: f64 = 0.0;
-            if let Some((first, entries)) = transaction_meta.entries.split_first() {
+            if let Some((first, posts)) = transaction_meta.posts.split_first() {
                 balance += first.amount;
 
                 println!("{0: <10} {1: <30} {2: <20} {3: >15} {4: >15}", 
@@ -47,13 +47,13 @@ impl Register {
                     format!("{: >1}", money!(balance, "USD"))
                 );
 
-                for entry in entries {
-                    balance += entry.amount;
+                for post in posts {
+                    balance += post.amount;
 
                     println!("{0: <41} {1: <20} {2: >15} {3: >15}",
                         "",
-                        fitaccount(&entry.account, 20),
-                        format!("{: >1}", money!(entry.amount, "USD")),
+                        fitaccount(&post.account, 20),
+                        format!("{: >1}", money!(post.amount, "USD")),
                         format!("{: >1}", money!(balance, "USD"))
                     );
                 }

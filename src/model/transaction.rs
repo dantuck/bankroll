@@ -49,7 +49,7 @@ impl Truncate for str {
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct Entry {
+pub struct Post {
     pub amount: f64,
     pub account: String,
 }
@@ -61,14 +61,14 @@ pub struct Transaction {
     pub account: Option<String>,
     pub account_offset: Option<String>,
     pub amount: Option<f64>,
-    pub entry: Option<Vec<Entry>>,
+    pub post: Option<Vec<Post>>,
 }
 
 #[derive(Clone, Debug)]
 pub struct TransactionMeta {
     pub date: String,
     pub description: String,
-    pub entries: Vec<Entry>,
+    pub posts: Vec<Post>,
     pub accounts: HashMap<String, account::Account>,
 }
 
@@ -76,23 +76,23 @@ impl Transaction {
     pub fn parse(self) -> TransactionMeta {
         let mut check: f64 = 0.0;
         let mut accounts: HashMap<String, account::Account> = HashMap::new();
-        let mut entries_parsed: Vec<Entry> = Vec::new();
+        let mut posts_parsed: Vec<Post> = Vec::new();
 
-        if let Some(entries) = self.entry {
-            for entry in entries {
-                check += entry.amount;
-                entries_parsed.push(entry);
+        if let Some(posts) = self.post {
+            for post in posts {
+                check += post.amount;
+                posts_parsed.push(post);
             }
         }
         else if let Some(_t) = self.amount {
             let offset_account = &self.account_offset;
-            let entry = Entry {
+            let post = Post {
                 amount: self.amount.unwrap(),
                 account: offset_account.as_ref().unwrap().to_string()
             };
 
-            check += entry.amount;
-            entries_parsed.push(entry);
+            check += post.amount;
+            posts_parsed.push(post);
         }
 
         if check != 0.0 {
@@ -103,24 +103,24 @@ impl Transaction {
                     check.abs() 
                 };
                 
-                entries_parsed.push(Entry {
+                posts_parsed.push(Post {
                     amount: check_inverse,
                     account: account,
                 });
             }
         }
 
-        for entry in &entries_parsed {
-            match accounts.get_mut(&entry.account) {
+        for post in &posts_parsed {
+            match accounts.get_mut(&post.account) {
                 Some(account) => {
-                    account.balance += &entry.amount;
+                    account.balance += &post.amount;
                 },
                 None => {
                     accounts.insert(
-                        entry.account.to_string(),
+                        post.account.to_string(),
                         account::Account {
-                            name: entry.account.to_string(),
-                            balance: entry.amount,
+                            name: post.account.to_string(),
+                            balance: post.amount,
                         }
                     );
                 }
@@ -130,7 +130,7 @@ impl Transaction {
         TransactionMeta {
             date: self.date,
             description: self.description,
-            entries: entries_parsed,
+            posts: posts_parsed,
             accounts: accounts,
         }
     }
