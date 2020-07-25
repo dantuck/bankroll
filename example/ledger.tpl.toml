@@ -2,10 +2,10 @@
 date = "2020-01-01"
 description = "income"
 account = "Equity:opening balance"
-[[transaction.entry]]
+[[transaction.post]]
 amount = 3000
 account = "Assets:checking"
-[[transaction.entry]]
+[[transaction.post]]
 amount = 10000
 account = "Assets:savings"
 
@@ -14,17 +14,18 @@ date = "2020-01-01"
 description = "Sample really long that would cause wrap"
 account = "Assets:checking"
 # amount and account_offset are optional
-    [[transaction.entry]]
+    # indention is optional
+    [[transaction.post]]
     amount = 10.00
     account = "Expenses:general"
-    [[transaction.entry]]
+    [[transaction.post]]
     amount = 10.00
     account = "Expenses:general"
-    [[transaction.entry]]
+    [[transaction.post]]
     amount = -10.00
     account = "Assets:savings"
 
-# demonstrates that transaction entries can be split up in a file
+# demonstrates that transaction posts can be split up in a file
 [default]
 account = "Assets:checking"
 account_offset = "Expenses:general"
@@ -35,11 +36,11 @@ description = "Sample transaction"
 account = "Assets:checking"
 amount = 20.00
 account_offset = "Expenses:general"
-# if entries are supplied amount and account_offset above are ignored
-[[transaction.entry]]
+# if posts are supplied amount and account_offset above are ignored
+[[transaction.post]]
 amount = 10.00
 account = "Expenses:general"
-[[transaction.entry]]
+[[transaction.post]]
 amount = 10.00
 account = "Expenses:general"
 
@@ -49,3 +50,14 @@ description = "Movie night"
 account = "Liabilities:credit"
 amount = 15.00
 account_offset = "Expenses:entertainment"
+
+[[transaction]]
+date = "2020-08-01"
+description = "Car Repair"
+account = "Assets:savings"
+account_offset = "Expenses:general"
+amount = 500
+[[transaction.post]]
+account = "Fund:Auto"
+amount = -200
+
