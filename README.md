@@ -47,13 +47,14 @@ export LEDGER_FILE="$HOME/ledger.toml"
 ### Example
 ```
 $ ./bankroll --help
-bankroll 0.0.1
+bankroll 0.0.2
 
 USAGE:
     bankroll <SUBCOMMAND>
 
 FLAGS:
     -h, --help       Prints help information
+    -r, --real       Only shows real transactions
     -V, --version    Prints version information
 
 SUBCOMMANDS:
@@ -64,13 +65,16 @@ SUBCOMMANDS:
 $ ./bankroll balance
 
       $ 2970.00 Assets:checking
-      $ 9990.00 Assets:savings
+      $ 9970.00 Assets:savings
     $ -13000.00 Equity:opening balance
         $ 15.00 Expenses:entertainment
-        $ 40.00 Expenses:general
+        $ 60.00 Expenses:general
        $ -15.00 Liabilities:credit
-───────────────
+─────────────── 
               0
+
+─────────────── Funds
+       $ 980.00 Fund:Auto
 
 $ ./bankroll balance
 
@@ -86,6 +90,9 @@ $ ./bankroll balance
                                           Assets:checking             $ -20.00               0
 2020-01-01 Movie night                    Expens:entertainment         $ 15.00         $ 15.00
                                           Liabilities:credit          $ -15.00               0
+2020-08-01 Car Repair                     Expenses:general             $ 20.00         $ 20.00
+                                          Assets:savings              $ -20.00               0
+                                          (Fund:Auto)                 $ -20.00
 
 $ ./bankroll import example/sample.csv
 

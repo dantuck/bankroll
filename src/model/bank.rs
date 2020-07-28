@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use csv::Reader;
 
-use crate::model::transaction;
+use crate::model::transaction::transaction::Transaction;
 use crate::util::file;
 use crate::error::{Result, Error, ErrorKind};
 
@@ -15,7 +15,7 @@ struct Record {
 
 #[derive(Serialize)]
 pub struct Bank {
-    pub transaction: Vec<transaction::Transaction>,
+    pub transaction: Vec<Transaction>,
 }
 
 pub fn import(file: &String, for_account: &Option<String>) -> Result<()> {
@@ -46,7 +46,7 @@ pub fn import(file: &String, for_account: &Option<String>) -> Result<()> {
     Ok(())
 }
 
-fn write_to_ledger(transactions: Vec<transaction::Transaction>) -> Result<()> {
+fn write_to_ledger(transactions: Vec<Transaction>) -> Result<()> {
     let toml = toml::to_string(&Bank {
         transaction: transactions
     }).unwrap();
@@ -63,20 +63,21 @@ fn write_to_ledger(transactions: Vec<transaction::Transaction>) -> Result<()> {
     Ok(())
 }
 
-fn parse_import(file: &String, account: &String, account_offset: &String) -> Result<Vec<transaction::Transaction>> {
-    let mut transactions: Vec<transaction::Transaction> = Vec::new();
+fn parse_import(file: &String, account: &String, account_offset: &String) -> Result<Vec<Transaction>> {
+    let mut transactions: Vec<Transaction> = Vec::new();
 
     let mut rdr = Reader::from_path(file)?;
     for result in rdr.deserialize() {
         let record: Record = result?;
         
-        transactions.push(transaction::Transaction {
+        transactions.push(Transaction {
             date: record.date,
             description: record.description,
             account: Some(account.to_string()),
             amount: Some(record.amount),
             account_offset: Some(account_offset.to_string()),
-            post: None
+            post: None,
+            fund: None
         });
     }
 

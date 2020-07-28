@@ -9,6 +9,9 @@ keywords = ["accounting", "finance", "ledger"]
 repository = "https://gitlab.com/dantuck/bankroll"
 documentation = "https://docs.rs/bankroll"
 readme = "README.md"
+gitlab = { repository = "https://gitlab.com/dantuck/bankroll", branch = "main" }
+codecov = { repository = "https://gitlab.com/dantuck/bankroll", branch = "main", service = "gitlab" }
+maintenance = { status = "actively-developed" }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
