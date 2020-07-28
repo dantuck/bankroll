@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::model::{account};
+use crate::model::{account, transaction};
+use transaction::fund::Fund;
 
 pub trait Truncate {
     fn fit_to(&self, chars: usize) -> String;
@@ -62,6 +63,7 @@ pub struct Transaction {
     pub account_offset: Option<String>,
     pub amount: Option<f64>,
     pub post: Option<Vec<Post>>,
+    pub fund: Option<Vec<Fund>>,
 }
 
 #[derive(Clone, Debug)]
@@ -69,6 +71,7 @@ pub struct TransactionMeta {
     pub date: String,
     pub description: String,
     pub posts: Vec<Post>,
+    pub funds: Option<Vec<Fund>>,
     pub accounts: HashMap<String, account::Account>,
 }
 
@@ -84,10 +87,10 @@ impl Transaction {
                 posts_parsed.push(post);
             }
         }
-        else if let Some(_t) = self.amount {
+        else if let Some(amount) = self.amount {
             let offset_account = &self.account_offset;
             let post = Post {
-                amount: self.amount.unwrap(),
+                amount: amount,
                 account: offset_account.as_ref().unwrap().to_string()
             };
 
@@ -131,6 +134,7 @@ impl Transaction {
             date: self.date,
             description: self.description,
             posts: posts_parsed,
+            funds: self.fund,
             accounts: accounts,
         }
     }

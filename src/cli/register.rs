@@ -2,17 +2,21 @@ use crate::cli::*;
 use crate::util::*;
 use crate::model::{ledger, transaction, account};
 use monee::*;
-use transaction::*;
+use transaction::transaction::*;
 use account::*;
 
 use crate::error::Result;
 
 #[derive(Debug, StructOpt)]
-pub struct RegisterOpt { }
+pub struct RegisterOpt {
+    /// Only shows real transactions
+    #[structopt(short, long)]
+    real: bool,
+}
 
 #[derive(Debug, Clone)]
 struct Register {
-    transactions: Vec<transaction::TransactionMeta>
+    transactions: Vec<TransactionMeta>
 }
 
 #[macro_export]
@@ -31,7 +35,7 @@ impl Register {
         }
     }
 
-    fn print(self) {
+    fn print(self, opts: &RegisterOpt) {
         println!();
 
         for transaction_meta in self.transactions {
@@ -57,6 +61,19 @@ impl Register {
                         format!("{: >1}", money!(balance, "USD"))
                     );
                 }
+
+                if !opts.real {
+                    if let Some(funds) = transaction_meta.funds {
+                        for fund in funds {
+                            println!("{0: <41} {1: <20} {2: >15} {3: >15}",
+                                "",
+                                fitaccount(&format!("({})", &fund.account), 20),
+                                format!("{: >1}", money!(fund.amount, "USD")),
+                                "".to_string()
+                            );
+                        }
+                    }
+                }
             }
         }
 
@@ -64,10 +81,11 @@ impl Register {
     }
 }
 
-pub fn eval(_cli: &Cli, _cmd: &RegisterOpt) -> Result<()> {
+pub fn eval(_cli: &Cli, opts: &RegisterOpt) -> Result<()> {
     let ledger_file = file::load()?;
 
-    register!(ledger_file).print();
+    register!(ledger_file)
+        .print(opts);
 
     Ok(())
 }

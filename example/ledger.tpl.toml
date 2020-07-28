@@ -51,13 +51,22 @@ account = "Liabilities:credit"
 amount = 15.00
 account_offset = "Expenses:entertainment"
 
+
+# Virtual transaction as funds (funds of virtual cash)
+[[transaction]]
+date = "2020-08-01"
+description = "funding bank funds"
+[[transaction.fund]]
+account = "Fund:Auto"
+amount = 1000
+
 [[transaction]]
 date = "2020-08-01"
 description = "Car Repair"
 account = "Assets:savings"
 account_offset = "Expenses:general"
-amount = 500
-[[transaction.post]]
+amount = 20
+[[transaction.fund]]
 account = "Fund:Auto"
-amount = -200
+amount = -20
 
