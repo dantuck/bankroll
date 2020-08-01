@@ -165,18 +165,20 @@ impl Balance {
         }
 
         print_horizontal_line(15, None, None, None);
-        println!("{:>15}", self.check);
+        println!("{:>15}", format!("{: >1}", money!(self.check, "USD")));
 
         if !opts.real {
             if let Some(fund_account) = self.fund_accounts {
-                println!();
-                print_horizontal_line(15, None, None, Some("Funds".to_string()));
-                let mut fund_accounts: Vec<(String, account::Account)> =
-                    fund_account.into_iter().collect();
-                fund_accounts.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+                if !fund_account.is_empty() {
+                    println!();
+                    print_horizontal_line(15, None, None, Some("Funds".to_string()));
+                    let mut fund_accounts: Vec<(String, account::Account)> =
+                        fund_account.into_iter().collect();
+                    fund_accounts.sort_unstable_by(|a, b| a.0.cmp(&b.0));
 
-                for (_, fund_account) in fund_accounts.iter() {
-                    print_account_ln(fund_account, None);
+                    for (_, fund_account) in fund_accounts.iter() {
+                        print_account_ln(fund_account, None);
+                    }
                 }
             }
         }

@@ -87,12 +87,13 @@ fn parse_import(
     for result in rdr.deserialize() {
         let record: Record = result?;
 
+        // account and account_offset are intentionally inverted
         transactions.push(Transaction {
             date: record.date,
             description: record.description,
-            account: Some(account.to_string()),
+            account: Some(account_offset.to_string()),
             amount: Some(record.amount),
-            account_offset: Some(account_offset.to_string()),
+            account_offset: Some(account.to_string()),
             post: None,
             fund: None,
         });
