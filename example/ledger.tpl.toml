@@ -29,6 +29,11 @@ account = "Assets:checking"
 [default]
 account = "Assets:checking"
 account_offset = "Expenses:general"
+[[default.setting]]
+account_name = "Assets:savings"
+account_threshold = [
+    { Limit = { limit = 0, color = "Red", operator = "LessThan" } }
+]
 
 [[transaction]]
 date = "2020-01-01"
@@ -50,6 +55,14 @@ description = "Movie night"
 account = "Liabilities:credit"
 amount = 15.00
 account_offset = "Expenses:entertainment"
+
+[[transaction]]
+date = "2020-01-01"
+description = "Really big purchase"
+account = "Assets:savings"
+account_offset = "Expenses:general"
+amount = 11000.00
+
 
 
 # Virtual transaction as funds (funds of virtual cash)
