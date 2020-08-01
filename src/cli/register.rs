@@ -1,9 +1,9 @@
 use crate::cli::*;
+use crate::model::{account, ledger, transaction};
 use crate::util::*;
-use crate::model::{ledger, transaction, account};
+use account::*;
 use monee::*;
 use transaction::transaction::*;
-use account::*;
 
 use crate::error::Result;
 
@@ -16,7 +16,7 @@ pub struct RegisterOpt {
 
 #[derive(Debug, Clone)]
 struct Register {
-    transactions: Vec<TransactionMeta>
+    transactions: Vec<TransactionMeta>,
 }
 
 #[macro_export]
@@ -31,7 +31,7 @@ impl Register {
         let transactions = ledger.parse_transactions();
 
         Register {
-            transactions: transactions
+            transactions: transactions,
         }
     }
 
@@ -43,7 +43,8 @@ impl Register {
             if let Some((first, posts)) = transaction_meta.posts.split_first() {
                 balance += first.amount;
 
-                println!("{0: <10} {1: <30} {2: <20} {3: >15} {4: >15}", 
+                println!(
+                    "{0: <10} {1: <30} {2: <20} {3: >15} {4: >15}",
                     transaction_meta.date,
                     transaction_meta.description.fit_to(30),
                     fitaccount(&first.account, 20),
@@ -54,7 +55,8 @@ impl Register {
                 for post in posts {
                     balance += post.amount;
 
-                    println!("{0: <41} {1: <20} {2: >15} {3: >15}",
+                    println!(
+                        "{0: <41} {1: <20} {2: >15} {3: >15}",
                         "",
                         fitaccount(&post.account, 20),
                         format!("{: >1}", money!(post.amount, "USD")),
@@ -65,7 +67,8 @@ impl Register {
                 if !opts.real {
                     if let Some(funds) = transaction_meta.funds {
                         for fund in funds {
-                            println!("{0: <41} {1: <20} {2: >15} {3: >15}",
+                            println!(
+                                "{0: <41} {1: <20} {2: >15} {3: >15}",
                                 "",
                                 fitaccount(&format!("({})", &fund.account), 20),
                                 format!("{: >1}", money!(fund.amount, "USD")),
@@ -84,8 +87,7 @@ impl Register {
 pub fn eval(_cli: &Cli, opts: &RegisterOpt) -> Result<()> {
     let ledger_file = file::load()?;
 
-    register!(ledger_file)
-        .print(opts);
+    register!(ledger_file).print(opts);
 
     Ok(())
 }

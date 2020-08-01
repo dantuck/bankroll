@@ -1,10 +1,10 @@
 mod balance;
-mod register;
 mod import;
+mod register;
 
 use balance::*;
-use register::*;
 use import::*;
+use register::*;
 
 pub use structopt::StructOpt;
 
@@ -27,15 +27,14 @@ pub enum Opt {
 
 pub fn run() -> Result<(), std::io::Error> {
     let cli = Cli::from_args();
-    
-    if let Err(err) = 
-        match &cli.cmd {
-            Opt::Balance(opt) => balance::eval(&cli, &opt),
-            Opt::Register(opt) => register::eval(&cli, &opt),
-            Opt::Import(opt) => import::eval(&cli, &opt),
-        } {
-            println!("\n{}\n", err.to_string())
-        }
+
+    if let Err(err) = match &cli.cmd {
+        Opt::Balance(opt) => balance::eval(&cli, &opt),
+        Opt::Register(opt) => register::eval(&cli, &opt),
+        Opt::Import(opt) => import::eval(&cli, &opt),
+    } {
+        println!("\n{}\n", err.to_string())
+    }
 
     Ok(())
 }

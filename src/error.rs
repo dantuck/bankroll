@@ -1,5 +1,5 @@
-use std::{io, fmt, result};
 use std::error::Error as StdError;
+use std::{fmt, io, result};
 
 /// A type alias for `Result<T, Error>`.
 pub type Result<T> = result::Result<T, Error>;
@@ -67,24 +67,17 @@ impl fmt::Display for Error {
         }
 
         match *self.0 {
-            ErrorKind::Io(ref err, ref message) => {
-                match message {
-                    Some(message) => write!(f, "{} [{}]", message, err),
-                    _ => write!(f, "{}", err),
-                }
+            ErrorKind::Io(ref err, ref message) => match message {
+                Some(message) => write!(f, "{} [{}]", message, err),
+                _ => write!(f, "{}", err),
             },
             ErrorKind::InvalidInput(ref s) => write!(f, "Invalid input: {}", s),
             ErrorKind::Parsing(ref s) => write!(f, "Unable to parse: {}", s),
-            ErrorKind::CSV(ref err) => {
-                match *err.kind() {
-                    csv::ErrorKind::Io(ref err) => 
-                        write!(f, "{}", err),
-                    _ => write!(f, "CSV error {}", err),
-                }
+            ErrorKind::CSV(ref err) => match *err.kind() {
+                csv::ErrorKind::Io(ref err) => write!(f, "{}", err),
+                _ => write!(f, "CSV error {}", err),
             },
         }
-
-        
 
         // match &self.1 {
         //     Some(message) => write!(f, "\n{}", message),
