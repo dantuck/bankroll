@@ -25,15 +25,13 @@ impl Truncate for str {
 
     fn truncate_to_offset(&self, boundary: usize) -> String {
         if boundary > self.len() {
-            return self.to_string()
+            return self.to_string();
         }
 
         let mut char_iter = self
             .char_indices()
             .rev()
-            .skip_while(move |(n, char)| {
-                *n > boundary - 2 || !char.is_ascii_whitespace()
-            });
+            .skip_while(move |(n, char)| *n > boundary - 2 || !char.is_ascii_whitespace());
 
         let mut charcount = boundary;
 
@@ -86,12 +84,11 @@ impl Transaction {
                 check += post.amount;
                 posts_parsed.push(post);
             }
-        }
-        else if let Some(amount) = self.amount {
+        } else if let Some(amount) = self.amount {
             let offset_account = &self.account_offset;
             let post = Post {
                 amount: amount,
-                account: offset_account.as_ref().unwrap().to_string()
+                account: offset_account.as_ref().unwrap().to_string(),
             };
 
             check += post.amount;
@@ -100,12 +97,8 @@ impl Transaction {
 
         if check != 0.0 {
             if let Some(account) = self.account {
-                let check_inverse = if check > 0.0 {
-                    -check 
-                } else { 
-                    check.abs() 
-                };
-                
+                let check_inverse = if check > 0.0 { -check } else { check.abs() };
+
                 posts_parsed.push(Post {
                     amount: check_inverse,
                     account: account,
@@ -117,14 +110,14 @@ impl Transaction {
             match accounts.get_mut(&post.account) {
                 Some(account) => {
                     account.balance += &post.amount;
-                },
+                }
                 None => {
                     accounts.insert(
                         post.account.to_string(),
                         account::Account {
                             name: post.account.to_string(),
                             balance: post.amount,
-                        }
+                        },
                     );
                 }
             }

@@ -1,15 +1,12 @@
 use serde::Deserialize;
 
 use super::default;
-use super::transaction::transaction::{
-    Transaction,
-    TransactionMeta
-};
+use super::transaction::transaction::{Transaction, TransactionMeta};
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Ledger {
     pub default: Option<default::Default>,
-    pub transaction: Option<Vec<Transaction>>
+    pub transaction: Option<Vec<Transaction>>,
 }
 
 impl Ledger {

@@ -32,7 +32,7 @@ pub fn fitaccount(name: &String, chars: usize) -> String {
                         first_len
                     }
                 };
-                
+
                 if first_len > trim_at {
                     let (keep, c) = first.split_at(trim_at);
                     result.push_str(keep);
@@ -46,7 +46,7 @@ pub fn fitaccount(name: &String, chars: usize) -> String {
 
                     if e.len() > 3 {
                         let (sub, is_overflow) = e.len().overflowing_sub(length);
-                        
+
                         let split_at: usize;
 
                         if is_overflow || sub <= 3 {
@@ -76,7 +76,7 @@ pub fn fitaccount(name: &String, chars: usize) -> String {
             }
         }
     }
-    
+
     result
 }
 
@@ -132,7 +132,7 @@ mod tests {
         let shortened = fitaccount(&name, 20);
         assert_eq!(shortened, "Equi:opening balance");
         assert_eq!(shortened.len(), 20);
-        
+
         // let name = "Asset:Name:On".to_string();
         // let shortened = name.fit_accountname_to(5);
         // assert_eq!(shortened, "Ass:Nam:On");

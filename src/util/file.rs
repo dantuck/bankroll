@@ -1,15 +1,8 @@
+use crate::error::{Error, ErrorKind, Result};
+use std::io::Write;
 use std::{fs, fs::OpenOptions};
-use std::{io::Write};
-use crate::error::{
-    Result,
-    Error,
-    ErrorKind
-};
 
-use crate::model::{
-    ledger,
-    default,
-};
+use crate::model::{default, ledger};
 
 pub fn get_file_name() -> String {
     match std::env::var("LEDGER_FILE") {
@@ -28,11 +21,10 @@ pub fn parse_ledger(filename: &String) -> Result<ledger::Ledger> {
     let file_path = fs::read_to_string(filename);
 
     if let Err(err) = file_path {
-        return Err(
-            Error::new(
-                ErrorKind::Io(err, Some(filename.to_string())
-            ), None)
-        );
+        return Err(Error::new(
+            ErrorKind::Io(err, Some(filename.to_string())),
+            None,
+        ));
     }
 
     Ok(toml::from_str(&file_path.unwrap()).unwrap())

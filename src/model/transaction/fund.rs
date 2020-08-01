@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::model::account::Account;
@@ -6,7 +6,7 @@ use crate::model::account::Account;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Fund {
     pub account: String,
-    pub amount: f64
+    pub amount: f64,
 }
 
 impl Fund {
@@ -17,14 +17,14 @@ impl Fund {
             match accounts.get_mut(&fund.account) {
                 Some(account) => {
                     account.balance += &fund.amount;
-                },
+                }
                 None => {
                     accounts.insert(
                         fund.account.to_string(),
                         Account {
                             name: fund.account.to_string(),
                             balance: fund.amount,
-                        }
+                        },
                     );
                 }
             }

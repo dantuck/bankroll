@@ -1,7 +1,7 @@
 use crate::cli::*;
 
-use crate::model::bank;
 use crate::error::Result;
+use crate::model::bank;
 
 #[derive(Debug, StructOpt)]
 pub struct ImportOpt {
@@ -13,7 +13,7 @@ pub struct ImportOpt {
 }
 
 #[derive(Debug)]
-pub struct Import { }
+pub struct Import {}
 
 pub fn eval(_cli: &Cli, cmd: &ImportOpt) -> Result<()> {
     println!();
