@@ -47,7 +47,7 @@ export LEDGER_FILE="$HOME/ledger.toml"
 ### Example
 ```
 $ ./bankroll --help
-bankroll 0.0.2
+bankroll 0.1.0
 
 USAGE:
     bankroll <SUBCOMMAND>
