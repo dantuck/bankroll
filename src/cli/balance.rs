@@ -1,10 +1,14 @@
-use ansi_term::Colour::{Green, White, RGB};
+use ansi_term::Colour::{Green, Red, White, RGB};
 use ansi_term::{ANSIString, ANSIStrings};
 use std::collections::HashMap;
 
 use crate::cli::*;
-use crate::model::account;
-use crate::model::transaction::{fund::Fund, transaction};
+use crate::model::transaction::{fund::Fund, transaction::Transaction};
+use crate::model::{
+    account,
+    default::{AccountSetting, AccountThreshold, Default, ThresholdOperator},
+    ledger::Ledger,
+};
 use crate::util::*;
 
 use monee::{self, money, Money};
@@ -23,12 +27,13 @@ struct Balance {
     accounts: HashMap<String, account::Account>,
     fund_accounts: Option<HashMap<String, account::Account>>,
     check: f64,
+    defaults: Option<Default>,
 }
 
 #[macro_export]
 macro_rules! balance {
-    ($x:expr) => {
-        Balance::new($x)
+    ($x:expr, $y:expr) => {
+        Balance::new($x, $y)
     };
 }
 
@@ -53,14 +58,59 @@ fn print_horizontal_line(
     println!("{} {}", output.paint(hline), text.unwrap_or_default());
 }
 
-fn print_account_ln(account: &account::Account) {
-    let mut color: ansi_term::Colour = White;
+fn print_account_ln(account: &account::Account, settings: Option<&AccountSetting>) {
+    let mut ansi_color: ansi_term::Colour = White;
 
     if account.balance >= 0.0 {
-        color = Green
+        ansi_color = Green
+    } else if account.balance < 0.0 {
+        ansi_color = Red
     }
 
-    let money_formatted = ANSIString::from(color.paint(format!(
+    if let Some(settings) = settings {
+        for threshold in &settings.account_thresholds {
+            match threshold {
+                AccountThreshold::Limit {
+                    limit,
+                    color,
+                    operator,
+                } => match operator {
+                    ThresholdOperator::LessThan => {
+                        if account.balance < *limit {
+                            ansi_color = color.to_ansi_color()
+                        }
+                    }
+                    ThresholdOperator::LessThanOrEqual => {
+                        if account.balance <= *limit {
+                            ansi_color = color.to_ansi_color()
+                        }
+                    }
+                    ThresholdOperator::Equal => {
+                        if account.balance.eq(limit) {
+                            ansi_color = color.to_ansi_color()
+                        }
+                    }
+                    ThresholdOperator::MoreThanOrEqual => {
+                        if account.balance >= *limit {
+                            ansi_color = color.to_ansi_color()
+                        }
+                    }
+                    ThresholdOperator::MoreThan => {
+                        if account.balance > *limit {
+                            ansi_color = color.to_ansi_color()
+                        }
+                    }
+                    ThresholdOperator::Between(lower, upper) => {
+                        if account.balance > *lower && account.balance < *upper {
+                            ansi_color = color.to_ansi_color()
+                        }
+                    }
+                },
+            }
+        }
+    }
+
+    let money_formatted = ANSIString::from(ansi_color.paint(format!(
         "{: >15}",
         format!("{: >1}", money!(account.balance, "USD"))
     )));
@@ -75,7 +125,7 @@ fn print_account_ln(account: &account::Account) {
 }
 
 impl Balance {
-    fn new(transactions: Option<Vec<transaction::Transaction>>) -> Balance {
+    fn new(transactions: Option<Vec<Transaction>>, defaults: Option<Default>) -> Balance {
         if let Some(transactions) = transactions {
             let processed = process_transactions(transactions);
 
@@ -83,12 +133,14 @@ impl Balance {
                 accounts: processed.0,
                 fund_accounts: Some(processed.1),
                 check: processed.2,
+                defaults,
             }
         } else {
             Balance {
                 accounts: HashMap::new(),
                 fund_accounts: None,
                 check: 0.0,
+                defaults,
             }
         }
     }
@@ -99,8 +151,17 @@ impl Balance {
         let mut accounts: Vec<(String, account::Account)> = self.accounts.into_iter().collect();
         accounts.sort_unstable_by(|a, b| a.0.cmp(&b.0));
 
+        let defaults = &self.defaults.unwrap_or(Default {
+            account: None,
+            account_offset: None,
+            setting: None,
+        });
+
+        let account_settings = defaults.get_account_settings();
+
         for (_, account) in accounts.iter() {
-            print_account_ln(account);
+            let account_setting = account_settings.get(&account.name);
+            print_account_ln(account, account_setting);
         }
 
         print_horizontal_line(15, None, None, None);
@@ -115,7 +176,7 @@ impl Balance {
                 fund_accounts.sort_unstable_by(|a, b| a.0.cmp(&b.0));
 
                 for (_, fund_account) in fund_accounts.iter() {
-                    print_account_ln(fund_account);
+                    print_account_ln(fund_account, None);
                 }
             }
         }
@@ -125,7 +186,7 @@ impl Balance {
 }
 
 pub fn process_transactions(
-    transactions: Vec<transaction::Transaction>,
+    transactions: Vec<Transaction>,
 ) -> (
     HashMap<String, account::Account>,
     HashMap<String, account::Account>,
@@ -175,9 +236,9 @@ pub fn process_transactions(
 }
 
 pub fn eval(_cli: &Cli, opts: &BalanceOpt) -> Result<()> {
-    let ledger_file = file::load()?;
+    let ledger_file: Ledger = file::load()?;
 
-    Balance::new(ledger_file.transaction).print(opts);
+    balance!(ledger_file.transaction, ledger_file.default).print(opts);
 
     Ok(())
 }
@@ -192,8 +253,10 @@ mod tests {
             accounts: HashMap::new(),
             fund_accounts: None,
             check: 0.0,
+            defaults: None,
         };
-        let test_account = balance!(None);
+
+        let test_account = balance!(None, None);
         assert_eq!(
             test_account.accounts.is_empty(),
             balance.accounts.is_empty()
