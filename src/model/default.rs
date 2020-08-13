@@ -1,6 +1,7 @@
 use ansi_term::Colour;
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::default::Default as StdDfault;
 
 // use ansi_term::Colour::{RGB, Green, Red, Yellow, White};
 #[derive(Deserialize, Debug, Clone, Copy)]
@@ -55,7 +56,7 @@ pub struct Setting {
     pub account_threshold: Option<Vec<AccountThreshold>>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, StdDfault)]
 pub struct Default {
     pub account: Option<String>,
     pub account_offset: Option<String>,
