@@ -1,18 +1,11 @@
 # Bankroll [![Latest Version]][crates.io] [![Docs]][docs.rs] [![Conduct svg]][Code of Conduct]
 
-
 [Latest Version]: https://img.shields.io/crates/v/bankroll.svg
 [crates.io]: https://crates.io/crates/bankroll
-[Docs]: https://docs.rs/bankroll/badge.svg
-[docs.rs]: https://docs.rs/bankroll
 [Conduct svg]: code-of-conduct.svg
 [Code of Conduct]: CODE_OF_CONDUCT.md
 
 Ledger implementation in Rust. It takes concepts from [ledger-cli](https://www.ledger-cli.org/) but with a [TOML](https://toml.io) file type.
-
-## Documentation
-
-Find it on [Docs.rs](https://docs.rs/bankroll)
 
 ### Install
 
@@ -47,7 +40,7 @@ export LEDGER_FILE="$HOME/ledger.toml"
 ### Example
 ```
 $ ./bankroll --help
-bankroll 0.1.1
+bankroll 0.2.0
 
 USAGE:
     bankroll <SUBCOMMAND>
@@ -64,34 +57,38 @@ SUBCOMMANDS:
     register    
 $ ./bankroll balance
 
-      $ 2970.00 Assets:checking
-      $ 9970.00 Assets:savings
-    $ -13000.00 Equity:opening balance
-        $ 15.00 Expenses:entertainment
-        $ 60.00 Expenses:general
-       $ -15.00 Liabilities:credit
+     $ 11940.00 Assets
+      $ 2970.00  Checking
+      $ 7990.00  Savings
+       $ 980.00   Fund:Auto
+    $ -13000.00 Equity
+    $ -13000.00  Opening Balance
+      $ 1075.00 Expenses
+        $ 15.00  Entertainment
+      $ 1060.00  General
+       $ -15.00 Liabilities
+       $ -15.00  Credit
 ─────────────── 
               0
 
-─────────────── Funds
-       $ 980.00 Fund:Auto
-
 $ ./bankroll balance
 
-2020-01-01 income                         Assets:checking            $ 3000.00       $ 3000.00
-                                          Assets:savings            $ 10000.00      $ 13000.00
-                                          Equi:opening balance     $ -13000.00               0
-2020-01-01 Sample really long that…       Expenses:general             $ 10.00         $ 10.00
-                                          Expenses:general             $ 10.00         $ 20.00
-                                          Assets:savings              $ -10.00         $ 10.00
-                                          Assets:checking             $ -10.00               0
-2020-01-01 Sample transaction             Expenses:general             $ 10.00         $ 10.00
-                                          Expenses:general             $ 10.00         $ 20.00
-                                          Assets:checking             $ -20.00               0
-2020-01-01 Movie night                    Expens:entertainment         $ 15.00         $ 15.00
-                                          Liabilities:credit          $ -15.00               0
-2020-08-01 Car Repair                     Expenses:general             $ 20.00         $ 20.00
-                                          Assets:savings              $ -20.00               0
+2020-01-01 income                         Assets:Checking            $ 3000.00       $ 3000.00
+                                          Assets:Savings            $ 10000.00      $ 13000.00
+                                          Equi:Opening Balance     $ -13000.00               0
+2020-01-01 Sample really long that…       Expenses:General             $ 10.00         $ 10.00
+                                          Expenses:General             $ 10.00         $ 20.00
+                                          Assets:Savings              $ -10.00         $ 10.00
+                                          Assets:Checking             $ -10.00               0
+2020-01-01 Sample transaction             Expenses:General             $ 10.00         $ 10.00
+                                          Expenses:General             $ 10.00         $ 20.00
+                                          Assets:Checking             $ -20.00               0
+2020-01-01 Movie night                    Expens:Entertainment         $ 15.00         $ 15.00
+                                          Liabilities:Credit          $ -15.00               0
+2020-01-01 Really big purchase            Expenses:General           $ 1000.00       $ 1000.00
+                                          Assets:Savings            $ -1000.00               0
+2020-08-01 Car Repair                     Expenses:General             $ 20.00         $ 20.00
+                                          Assets:Savings              $ -20.00               0
                                           (Fund:Auto)                 $ -20.00
 
 $ ./bankroll import example/sample.csv

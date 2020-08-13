@@ -1,36 +1,36 @@
 [[transaction]]
 date = "2020-01-01"
 description = "income"
-account = "Equity:opening balance"
+account = "Equity:Opening Balance"
 [[transaction.post]]
 amount = 3000
-account = "Assets:checking"
+account = "Assets:Checking"
 [[transaction.post]]
 amount = 10000
-account = "Assets:savings"
+account = "Assets:Savings"
 
 [[transaction]]
 date = "2020-01-01"
 description = "Sample really long that would cause wrap"
-account = "Assets:checking"
+account = "Assets:Checking"
 # amount and account_offset are optional
     # indention is optional
     [[transaction.post]]
     amount = 10.00
-    account = "Expenses:general"
+    account = "Expenses:General"
     [[transaction.post]]
     amount = 10.00
-    account = "Expenses:general"
+    account = "Expenses:General"
     [[transaction.post]]
     amount = -10.00
-    account = "Assets:savings"
+    account = "Assets:Savings"
 
 # demonstrates that transaction posts can be split up in a file
 [default]
-account = "Assets:checking"
-account_offset = "Expenses:general"
+account = "Assets:Checking"
+account_offset = "Expenses:General"
 [[default.setting]]
-account_name = "Assets:savings"
+account_name = "Assets:Savings"
 account_threshold = [
     { Limit = { limit = 0, color = "Red", operator = "LessThan" } }
 ]
@@ -38,48 +38,47 @@ account_threshold = [
 [[transaction]]
 date = "2020-01-01"
 description = "Sample transaction"
-account = "Assets:checking"
+account = "Assets:Checking"
 amount = 20.00
-account_offset = "Expenses:general"
+account_offset = "Expenses:General"
 # if posts are supplied amount and account_offset above are ignored
 [[transaction.post]]
 amount = 10.00
-account = "Expenses:general"
+account = "Expenses:General"
 [[transaction.post]]
 amount = 10.00
-account = "Expenses:general"
+account = "Expenses:General"
 
 [[transaction]]
 date = "2020-01-01"
 description = "Movie night"
-account = "Liabilities:credit"
+account = "Liabilities:Credit"
 amount = 15.00
-account_offset = "Expenses:entertainment"
+account_offset = "Expenses:Entertainment"
 
 [[transaction]]
 date = "2020-01-01"
 description = "Really big purchase"
-account = "Assets:savings"
-account_offset = "Expenses:general"
-amount = 11000.00
-
-
+account = "Assets:Savings"
+account_offset = "Expenses:General"
+amount = 1000.00
 
 # Virtual transaction as funds (funds of virtual cash)
 [[transaction]]
 date = "2020-08-01"
 description = "funding bank funds"
 [[transaction.fund]]
-account = "Fund:Auto"
+account = "Assets:Savings"
+name = "Fund:Auto"
 amount = 1000
 
 [[transaction]]
 date = "2020-08-01"
 description = "Car Repair"
-account = "Assets:savings"
-account_offset = "Expenses:general"
+account = "Assets:Savings"
+account_offset = "Expenses:General"
 amount = 20
 [[transaction.fund]]
-account = "Fund:Auto"
+name = "Fund:Auto"
+account = "Assets:Savings"
 amount = -20
-

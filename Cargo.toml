@@ -1,13 +1,12 @@
 [package]
 name = "bankroll"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Daniel Tucker <bankroll@dantuck.com>"]
 edition = "2018"
 license = "GPL-3.0"
 description = "[WIP] Financial Ledger"
 keywords = ["accounting", "finance", "ledger"]
 repository = "https://gitlab.com/dantuck/bankroll"
-documentation = "https://docs.rs/bankroll"
 readme = "README.md"
 gitlab = { repository = "https://gitlab.com/dantuck/bankroll", branch = "main" }
 codecov = { repository = "https://gitlab.com/dantuck/bankroll", branch = "main", service = "gitlab" }

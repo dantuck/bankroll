@@ -59,7 +59,7 @@ fn print_transactions(transactions: Vec<TransactionMeta>, opts: &RegisterOpt) {
                         println!(
                             "{0: <41} {1: <20} {2: >15} {3: >15}",
                             "",
-                            fitaccount(&format!("({})", &fund.account), 20),
+                            fitaccount(&format!("({})", &fund.name), 20),
                             format!("{: >1}", money!(fund.amount, "USD")),
                             "".to_string()
                         );

@@ -3,11 +3,10 @@ use ansi_term::{ANSIString, ANSIStrings};
 use std::collections::HashMap;
 
 use crate::cli::*;
-use crate::model::transaction::{fund::Fund, transaction::Transaction};
 use crate::model::{
-    account,
+    account::Account,
     default::{AccountSetting, AccountThreshold, Default, ThresholdOperator},
-    ledger::Ledger,
+    ledger::Accounts,
 };
 use crate::util::*;
 
@@ -24,16 +23,14 @@ pub struct BalanceOpt {
 
 #[derive(Debug, Clone)]
 struct Balance {
-    accounts: HashMap<String, account::Account>,
-    fund_accounts: Option<HashMap<String, account::Account>>,
-    check: f64,
+    accounts: Accounts,
     defaults: Option<Default>,
 }
 
 #[macro_export]
 macro_rules! balance {
-    ($x:expr, $y:expr) => {
-        Balance::new($x, $y)
+    ($x:expr) => {
+        Balance::new($x.0, $x.1)
     };
 }
 
@@ -58,7 +55,11 @@ fn print_horizontal_line(
     println!("{} {}", output.paint(hline), text.unwrap_or_default());
 }
 
-fn print_account_ln(account: &account::Account, settings: Option<&AccountSetting>) {
+fn print_account_ln(
+    account: &Account,
+    settings: Option<&AccountSetting>,
+    indent_by: Option<usize>,
+) {
     let mut ansi_color: ansi_term::Colour = White;
 
     if account.balance >= 0.0 {
@@ -110,6 +111,8 @@ fn print_account_ln(account: &account::Account, settings: Option<&AccountSetting
         }
     }
 
+    let account_name: String = account.name.to_string();
+
     let money_formatted = ANSIString::from(ansi_color.paint(format!(
         "{: >15}",
         format!("{: >1}", money!(account.balance, "USD"))
@@ -117,151 +120,150 @@ fn print_account_ln(account: &account::Account, settings: Option<&AccountSetting
 
     let strings: &[ANSIString<'static>] = &[
         money_formatted,
-        ANSIString::from(" "),
-        ANSIString::from(format!("{: <}", account.name)),
+        ANSIString::from(" ".repeat(indent_by.unwrap_or(1))),
+        ANSIString::from(format!("{: <}", account_name)),
     ];
 
-    println!("{}", ANSIStrings(strings))
+    println!("{}", ANSIStrings(strings));
 }
 
 impl Balance {
-    fn new(transactions: Option<Vec<Transaction>>, defaults: Option<Default>) -> Balance {
-        if let Some(transactions) = transactions {
-            let processed = process_transactions(transactions);
+    fn new(accounts: Accounts, defaults: Option<Default>) -> Balance {
+        Balance { accounts, defaults }
+    }
 
-            Balance {
-                accounts: processed.0,
-                fund_accounts: Some(processed.1),
-                check: processed.2,
-                defaults,
-            }
-        } else {
-            Balance {
-                accounts: HashMap::new(),
-                fund_accounts: None,
-                check: 0.0,
-                defaults,
+    fn get_by_account_type(
+        self,
+        opts: &BalanceOpt,
+    ) -> (HashMap<String, (Account, usize)>, Default) {
+        let mut map: HashMap<String, (Account, usize)> = HashMap::new();
+
+        let accounts: &Vec<(String, (Account, HashMap<String, Account>))> =
+            &self.accounts.into_iter().collect();
+
+        for (account_key, element) in accounts.into_iter() {
+            let mut indented_by: usize = 1;
+            let account = &element.0;
+            let funds = &element.1;
+            let account_name_vec: Vec<&str> = account_key.split_terminator(':').collect();
+
+            // get the account type
+            if let Some(account_type) = account_name_vec.first() {
+                // check if account_type is already in the result
+                if let Some(parent) = map.get_mut(&account_type.to_string()) {
+                    // found parent
+                    // add balance to parent
+                    parent.0.balance += account.balance;
+                    indented_by += parent.1;
+
+                    map.insert(
+                        account_name_vec.split_at(2).0.join(":"),
+                        (
+                            Account {
+                                name: account_name_vec.split_at(1).1.join(":"),
+                                balance: account.balance,
+                            },
+                            indented_by,
+                        ),
+                    );
+                } else {
+                    map.insert(
+                        account_type.to_string(),
+                        (
+                            Account {
+                                name: account_type.to_string(),
+                                balance: account.balance,
+                            },
+                            indented_by,
+                        ),
+                    );
+
+                    indented_by += 1;
+                    map.insert(
+                        account_name_vec.split_at(2).0.join(":"),
+                        (
+                            Account {
+                                name: account_name_vec.split_at(1).1.join(":"),
+                                balance: account.balance,
+                            },
+                            indented_by,
+                        ),
+                    );
+                }
+
+                if !opts.real {
+                    for (_, fund) in funds.into_iter() {
+                        if let Some(account) =
+                            map.get_mut(&account_name_vec.split_at(2).0.join(":"))
+                        {
+                            account.0.balance -= fund.balance;
+                        }
+                        indented_by += 1;
+                        map.insert(
+                            account_name_vec.split_at(2).0.join(":") + &fund.name.to_owned(),
+                            (
+                                Account {
+                                    name: fund.name.to_string(),
+                                    balance: fund.balance,
+                                },
+                                indented_by,
+                            ),
+                        );
+                    }
+                }
             }
         }
+
+        (map, self.defaults.unwrap_or_default())
     }
 
     pub fn print(self, opts: &BalanceOpt) {
         println!();
 
-        let mut accounts: Vec<(String, account::Account)> = self.accounts.into_iter().collect();
+        let accounts_by_type = self.get_by_account_type(opts);
+        let account_settings = accounts_by_type.1.get_account_settings();
+
+        let mut accounts: Vec<(String, (Account, usize))> =
+            accounts_by_type.0.into_iter().collect();
         accounts.sort_unstable_by(|a, b| a.0.cmp(&b.0));
 
-        let defaults = &self.defaults.unwrap_or(Default {
-            account: None,
-            account_offset: None,
-            setting: None,
-        });
-
-        let account_settings = defaults.get_account_settings();
-
-        for (_, account) in accounts.iter() {
-            let account_setting = account_settings.get(&account.name);
-            print_account_ln(account, account_setting);
+        let mut balance_check: f64 = 0.0;
+        for (_, account) in accounts {
+            balance_check += &account.0.balance;
+            let account_setting = account_settings.get(&account.0.name);
+            print_account_ln(&account.0, account_setting, Some(account.1));
         }
 
         print_horizontal_line(15, None, None, None);
-        println!("{:>15}", format!("{: >1}", money!(self.check, "USD")));
-
-        if !opts.real {
-            if let Some(fund_account) = self.fund_accounts {
-                if !fund_account.is_empty() {
-                    println!();
-                    print_horizontal_line(15, None, None, Some("Funds".to_string()));
-                    let mut fund_accounts: Vec<(String, account::Account)> =
-                        fund_account.into_iter().collect();
-                    fund_accounts.sort_unstable_by(|a, b| a.0.cmp(&b.0));
-
-                    for (_, fund_account) in fund_accounts.iter() {
-                        print_account_ln(fund_account, None);
-                    }
-                }
-            }
-        }
+        println!("{:>15}", balance_check);
 
         println!();
     }
 }
 
-pub fn process_transactions(
-    transactions: Vec<Transaction>,
-) -> (
-    HashMap<String, account::Account>,
-    HashMap<String, account::Account>,
-    f64,
-) {
-    let mut accounts: HashMap<String, account::Account> = HashMap::new();
-    let mut fund_accounts: HashMap<String, account::Account> = HashMap::new();
-    let mut check: f64 = 0.0;
-
-    for transaction in transactions {
-        let parsed = transaction.parse();
-
-        for (_, account) in parsed.accounts.iter() {
-            match accounts.get_mut(&account.name) {
-                Some(acc) => {
-                    acc.balance += &account.balance;
-                }
-                None => {
-                    accounts.insert(
-                        account.name.to_string(),
-                        account::Account {
-                            name: account.name.to_string(),
-                            balance: account.balance,
-                        },
-                    );
-                }
-            }
-
-            check += account.balance;
-        }
-
-        if let Some(fund) = parsed.funds {
-            for fund in Fund::parse_to_accounts(&fund) {
-                match fund_accounts.get_mut(&fund.0) {
-                    Some(account) => {
-                        account.balance += &fund.1.balance;
-                    }
-                    None => {
-                        fund_accounts.insert(fund.0, fund.1);
-                    }
-                }
-            }
-        }
-    }
-
-    (accounts, fund_accounts, check)
-}
-
 pub fn eval(_cli: &Cli, opts: &BalanceOpt) -> Result<()> {
-    let ledger_file: Ledger = file::load()?;
+    let ledger_file = file::load()?.parse();
 
-    balance!(ledger_file.transaction, ledger_file.default).print(opts);
+    balance!(ledger_file).print(opts);
 
     Ok(())
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
 
-    #[test]
-    fn test_balance_empty_transactions() {
-        let balance = Balance {
-            accounts: HashMap::new(),
-            fund_accounts: None,
-            check: 0.0,
-            defaults: None,
-        };
+//     #[test]
+//     fn test_balance_empty_transactions() {
+//         let balance = Balance {
+//             accounts: HashMap::new(),
+//             defaults: None,
+//         };
 
-        let test_account = balance!(None, None);
-        assert_eq!(
-            test_account.accounts.is_empty(),
-            balance.accounts.is_empty()
-        );
-    }
-}
+//         let test_account = balance!((None, None));
+//         assert_eq!(
+//             test_account.accounts.is_empty(),
+//             balance.accounts.is_empty()
+//         );
+//     }
+// }
