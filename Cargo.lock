@@ -46,7 +46,7 @@ checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 
 [[package]]
 name = "bankroll"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "ansi_colours",
  "ansi_term 0.12.1",
@@ -180,9 +180,9 @@ checksum = "3728d817d99e5ac407411fa471ff9800a778d88a24685968b36824eaf4bee400"
 
 [[package]]
 name = "monee"
-version = "0.0.5"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10185d7e26610b2ca56d56254e26b1654bbe964e7bd94be07d726f964d19d2db"
+checksum = "215c966660ed064dea5f7cd86552ba60631a2881673805179ea7245363787e6a"
 dependencies = [
  "lazy_static",
 ]

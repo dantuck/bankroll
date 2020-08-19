@@ -57,15 +57,15 @@ SUBCOMMANDS:
     register    
 $ ./bankroll balance
 
-     $ 11940.00 Assets
-      $ 2970.00  Checking
-      $ 7990.00  Savings
+    $ 11,940.00 Assets
+     $ 2,970.00  Checking
+     $ 7,990.00  Savings
        $ 980.00   Fund:Auto
-    $ -13000.00 Equity
-    $ -13000.00  Opening Balance
-      $ 1075.00 Expenses
+   $ -13,000.00 Equity
+   $ -13,000.00  Opening Balance
+     $ 1,075.00 Expenses
         $ 15.00  Entertainment
-      $ 1060.00  General
+     $ 1,060.00  General
        $ -15.00 Liabilities
        $ -15.00  Credit
 ─────────────── 
@@ -73,9 +73,9 @@ $ ./bankroll balance
 
 $ ./bankroll balance
 
-2020-01-01 income                         Assets:Checking            $ 3000.00       $ 3000.00
-                                          Assets:Savings            $ 10000.00      $ 13000.00
-                                          Equi:Opening Balance     $ -13000.00               0
+2020-01-01 income                         Assets:Checking           $ 3,000.00      $ 3,000.00
+                                          Assets:Savings           $ 10,000.00     $ 13,000.00
+                                          Equi:Opening Balance    $ -13,000.00               0
 2020-01-01 Sample really long that…       Expenses:General             $ 10.00         $ 10.00
                                           Expenses:General             $ 10.00         $ 20.00
                                           Assets:Savings              $ -10.00         $ 10.00
@@ -85,12 +85,12 @@ $ ./bankroll balance
                                           Assets:Checking             $ -20.00               0
 2020-01-01 Movie night                    Expens:Entertainment         $ 15.00         $ 15.00
                                           Liabilities:Credit          $ -15.00               0
-2020-01-01 Really big purchase            Expenses:General           $ 1000.00       $ 1000.00
-                                          Assets:Savings            $ -1000.00               0
+2020-01-01 Really big purchase            Expenses:General          $ 1,000.00      $ 1,000.00
+                                          Assets:Savings           $ -1,000.00               0
 2020-08-01 Car Repair                     Expenses:General             $ 20.00         $ 20.00
                                           Assets:Savings              $ -20.00               0
-                                          (Fund:Auto)                 $ -20.00
-
+                                          (Fund:Auto)                 $ -20.00                
+                                          
 $ ./bankroll import example/sample.csv
 
 "example/sample.csv" imported Successfully
