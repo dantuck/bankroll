@@ -41,18 +41,18 @@ macro_rules! balance {
 /// @param color (Option or None) default = `RGB(255, 140, 0)`
 ///
 /// @param line_char (Option or None) default `─`
-fn print_horizontal_line(
+fn horizontal_line(
     width: usize,
     color: Option<ansi_term::Colour>,
     line_char: Option<char>,
     text: Option<String>,
-) {
+) -> String {
     let color = color.unwrap_or(RGB(255, 140, 0));
     let hline = line_char.unwrap_or('─').to_string().repeat(width);
 
     let output = color.normal();
 
-    println!("{} {}", output.paint(hline), text.unwrap_or_default());
+    format!("{} {}", output.paint(hline), text.unwrap_or_default()).to_string()
 }
 
 fn print_account_ln(
@@ -234,8 +234,8 @@ impl Balance {
             print_account_ln(&account.0, account_setting, Some(account.1));
         }
 
-        print_horizontal_line(15, None, None, None);
-        println!("{:>15}", balance_check);
+        println!("{}", horizontal_line(15, None, None, None));
+        println!("{:>15}", format!("{: >1}", money!(balance_check, "USD")));
 
         println!();
     }
@@ -249,21 +249,84 @@ pub fn eval(_cli: &Cli, opts: &BalanceOpt) -> Result<()> {
     Ok(())
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     #[test]
-//     fn test_balance_empty_transactions() {
-//         let balance = Balance {
-//             accounts: HashMap::new(),
-//             defaults: None,
-//         };
+    fn get_ledger_file_parsed() -> (Accounts, Option<Default>) {
+        let mut accounts: Accounts = HashMap::new();
 
-//         let test_account = balance!((None, None));
-//         assert_eq!(
-//             test_account.accounts.is_empty(),
-//             balance.accounts.is_empty()
-//         );
-//     }
-// }
+        accounts.insert(
+            "Equity:Opening Balance".to_string(),
+            (
+                Account {
+                    name: "Equity:Opening Balance".to_string(),
+                    balance: -1000.0,
+                },
+                HashMap::new(),
+            ),
+        );
+
+        accounts.insert(
+            "Assets:Checking".to_string(),
+            (
+                Account {
+                    name: "Assets:Checking".to_string(),
+                    balance: 200.0,
+                },
+                HashMap::new(),
+            ),
+        );
+
+        accounts.insert(
+            "Assets:Savings".to_string(),
+            (
+                Account {
+                    name: "Assets:Savings".to_string(),
+                    balance: 800.0,
+                },
+                HashMap::new(),
+            ),
+        );
+
+        (accounts, Some(Default::default()))
+    }
+
+    #[test]
+    fn balance_macro_creates_empty_struct() {
+        let balance = Balance {
+            accounts: HashMap::new(),
+            defaults: Some(Default::default()),
+        };
+
+        let test_input = (HashMap::new(), Some(Default::default()));
+        let test_account = balance!(test_input);
+
+        assert_eq!(
+            test_account.accounts.is_empty(),
+            balance.accounts.is_empty()
+        );
+    }
+
+    #[test]
+    fn balance_account_set() {
+        let balance = balance!(get_ledger_file_parsed());
+        let equity: Option<_> = balance.accounts.get("Equity:Opening Balance");
+
+        assert_eq!(equity.unwrap().0.name, "Equity:Opening Balance");
+    }
+
+    #[test]
+    fn balance_horizontal_line() {
+        let line = horizontal_line(5, None, None, None);
+        assert_eq!(line, "\u{1b}[38;2;255;140;0m─────\u{1b}[0m ");
+    }
+
+    #[test]
+    fn accounts_by_type() {
+        let balance = balance!(get_ledger_file_parsed());
+        let balance_opts = BalanceOpt { real: true };
+
+        assert_eq!(balance.get_by_account_type(&balance_opts).0.len(), 5);
+    }
+}
