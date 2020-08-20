@@ -90,7 +90,7 @@ fn parse_import(
         // account and account_offset are intentionally inverted
         transactions.push(Transaction {
             date: record.date,
-            description: record.description,
+            description: record.description.trim().to_string(),
             account: Some(account_offset.to_string()),
             amount: Some(record.amount),
             account_offset: Some(account.to_string()),
