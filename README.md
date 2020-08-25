@@ -1,9 +1,11 @@
-# Bankroll [![Latest Version]][crates.io] [![Docs]][docs.rs] [![Conduct svg]][Code of Conduct]
+# Bankroll [![Latest Version]][crates.io] [![Conduct svg]][Code of Conduct]
 
 [Latest Version]: https://img.shields.io/crates/v/bankroll.svg
 [crates.io]: https://crates.io/crates/bankroll
 [Conduct svg]: code-of-conduct.svg
 [Code of Conduct]: CODE_OF_CONDUCT.md
+
+<a href="https://www.buymeacoffee.com/dantuck" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
 
 Ledger implementation in Rust. It takes concepts from [ledger-cli](https://www.ledger-cli.org/) but with a [TOML](https://toml.io) file type.
 
