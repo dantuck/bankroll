@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 
 use crate::model::{account, transaction};
 use transaction::fund::Fund;
@@ -130,5 +131,14 @@ impl Transaction {
             funds: self.fund,
             accounts: accounts,
         }
+    }
+}
+
+impl Hash for Transaction {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.date.hash(state);
+        self.amount.unwrap_or(0.0).to_bits().hash(state);
+        self.account.hash(state);
+        self.account_offset.hash(state);
     }
 }
