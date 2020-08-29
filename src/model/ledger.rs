@@ -30,6 +30,8 @@ impl Ledger {
             }
         }
 
+        transactions_vec.sort_unstable_by(|a, b| a.date.cmp(&b.date));
+
         transactions_vec
     }
 

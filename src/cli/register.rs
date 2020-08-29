@@ -72,10 +72,8 @@ fn print_transactions(transactions: Vec<TransactionMeta>, opts: &RegisterOpt) {
 
 impl Register {
     fn new(ledger: ledger::Ledger) -> Register {
-        let transactions = ledger.parse_transactions();
-
         Register {
-            transactions: transactions,
+            transactions: ledger.parse_transactions(),
         }
     }
 
